@@ -503,14 +503,49 @@ export async function fetchPatientsPerMonth(): Promise<PatientsPerMonthRow[]> {
   return (data ?? []) as PatientsPerMonthRow[]
 }
 
-export async function fetchAppointmentStatusThisMonth(): Promise<StatusRow[]> {
+export async function fetchAppointmentStatusSummary(): Promise<StatusRow[]> {
   const ownerId = await requireClinicUser()
   const supabase = createAdminClient()
   const { data, error } = await supabase
-    .from('appointment_status_this_month')
-    .select('status, total')
+    .from('appointments')
+    .select('status')
     .eq('owner_id', ownerId)
 
-  if (error) throw new Error(error.message)
-  return (data ?? []) as StatusRow[]
+  if (error) {
+    console.error('Failed to fetch appointment status summary:', {
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+    })
+    throw new Error('Failed to fetch appointment status summary.')
+  }
+
+  const totals: Record<StatusRow['status'], number> = {
+    booked: 0,
+    done: 0,
+    no_show: 0,
+  }
+
+  for (const row of data ?? []) {
+    switch (row.status) {
+      case 'booked':
+        totals.booked += 1
+        break
+      case 'done':
+        totals.done += 1
+        break
+      case 'no_show':
+        totals.no_show += 1
+        break
+      default:
+        throw new Error(`Unexpected appointment status: ${String(row.status)}`)
+    }
+  }
+
+  return [
+    { status: 'booked', total: totals.booked },
+    { status: 'done', total: totals.done },
+    { status: 'no_show', total: totals.no_show },
+  ]
 }

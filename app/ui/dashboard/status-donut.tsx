@@ -1,53 +1,94 @@
-'use client'
-
-import { PieChart, Pie, Sector, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import type { PieSectorShapeProps, PieLabelRenderProps } from 'recharts'
 import type { StatusRow } from '@/app/lib/data'
 
-const DISPLAY: Record<string, string> = { booked: 'Booked', done: 'Done', no_show: 'No-show' }
-const COLOURS: Record<string, string> = { Booked: '#2563eb', Done: '#16a34a', 'No-show': '#dc2626' }
+const STATUS_OPTIONS = [
+  { status: 'booked', label: 'Booked', color: '#2563eb' },
+  { status: 'done', label: 'Done', color: '#16a34a' },
+  { status: 'no_show', label: 'No-show', color: '#dc2626' },
+] as const
 
-function Slice(props: PieSectorShapeProps) {
-  return <Sector {...props} fill={COLOURS[String(props.name)] ?? '#9ca3af'} />
-}
+type AppointmentStatus = (typeof STATUS_OPTIONS)[number]['status']
 
-function SliceLabel({ x, y, textAnchor, name, value, percent }: PieLabelRenderProps) {
-  const pct = Math.round((percent ?? 0) * 100)
-  return (
-    <text x={x} y={y} textAnchor={textAnchor} fontSize={12} fill="#111827">
-      {String(name)}: {value} ({pct}%)
-    </text>
-  )
-}
+const RADIUS = 42
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 
 export default function StatusDonut({ rows }: { rows: StatusRow[] }) {
-  const total = rows.reduce((n, r) => n + r.total, 0)
+  const totals = rows.reduce<Record<AppointmentStatus, number>>(
+    (counts, row) => {
+      counts[row.status] += row.total
+      return counts
+    },
+    { booked: 0, done: 0, no_show: 0 },
+  )
+  const total = Object.values(totals).reduce((sum, count) => sum + count, 0)
   if (total === 0) {
-    return <p className="text-sm text-gray-500">No appointments this month yet. Add one to see the split.</p>
+    return <p className="text-sm text-gray-500">No appointments yet. Add one to see the split.</p>
   }
-  const data = rows.map((r) => ({ name: DISPLAY[r.status] ?? r.status, value: r.total }))
-  const noShow = rows.find((r) => r.status === 'no_show')?.total ?? 0
+  const noShow = totals.no_show
 
   return (
     <div>
-      <ResponsiveContainer width="100%" height={300}>
-        <PieChart>
-          <Pie
-            data={data}
-            dataKey="value"
-            nameKey="name"
-            innerRadius="55%"
-            outerRadius="80%"
-            shape={Slice}
-            label={SliceLabel}
-            labelLine
-          />
-          <Tooltip />
-          <Legend />
-        </PieChart>
-      </ResponsiveContainer>
+      <div className="flex justify-center py-4">
+        <svg
+          viewBox="0 0 100 100"
+          className="h-56 w-56"
+          role="img"
+          aria-label={STATUS_OPTIONS.map(
+            (option) => `${option.label}: ${totals[option.status]} appointments`,
+          ).join(', ')}
+        >
+          <g transform="rotate(-90 50 50)">
+            {STATUS_OPTIONS.map((option, index) => {
+              const count = totals[option.status]
+              const sliceLength = (count / total) * CIRCUMFERENCE
+              const sliceOffset = STATUS_OPTIONS.slice(0, index).reduce(
+                (sum, previous) => sum + (totals[previous.status] / total) * CIRCUMFERENCE,
+                0,
+              )
+
+              return (
+                <circle
+                  key={option.status}
+                  cx="50"
+                  cy="50"
+                  r={RADIUS}
+                  fill="none"
+                  stroke={option.color}
+                  strokeWidth="16"
+                  strokeDasharray={`${sliceLength} ${CIRCUMFERENCE - sliceLength}`}
+                  strokeDashoffset={-sliceOffset}
+                >
+                  <title>{`${option.label}: ${count} (${Math.round((count / total) * 100)}%)`}</title>
+                </circle>
+              )
+            })}
+          </g>
+          <text x="50" y="48" textAnchor="middle" className="fill-gray-900 text-[12px] font-semibold">
+            {total}
+          </text>
+          <text x="50" y="59" textAnchor="middle" className="fill-gray-500 text-[5px]">
+            appointments
+          </text>
+        </svg>
+      </div>
+      <ul className="grid grid-cols-1 gap-x-4 gap-y-2 text-sm sm:grid-cols-3">
+        {STATUS_OPTIONS.map((option) => {
+          const count = totals[option.status]
+          return (
+            <li key={option.status} className="flex items-center gap-2">
+              <span
+                className="h-3 w-3 shrink-0 rounded-sm"
+                style={{ backgroundColor: option.color }}
+                aria-hidden="true"
+              />
+              <span>
+                {option.label}: {count} ({Math.round((count / total) * 100)}%)
+              </span>
+            </li>
+          )
+        })}
+      </ul>
       <p className="text-sm">
-        {Math.round((noShow / total) * 100)}% of {total} appointments this month were no-shows.
+        {Math.round((noShow / total) * 100)}% of all {total} appointments were no-shows.
         The owner decides whether to send reminder messages.
       </p>
     </div>

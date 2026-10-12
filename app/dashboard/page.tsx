@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import {
-  fetchAppointmentStatusThisMonth,
+  fetchAppointmentStatusSummary,
   fetchClinicSummary,
   fetchPatientsPerMonth,
 } from '@/app/lib/data';
@@ -30,7 +30,7 @@ export default async function Page() {
   const [summary, perMonth, statusRows] = await Promise.all([
     fetchClinicSummary(),
     fetchPatientsPerMonth(),
-    fetchAppointmentStatusThisMonth(),
+    fetchAppointmentStatusSummary(),
   ]);
   const { patientCount, appointmentCount, treatmentCount, upcomingAppointments } = summary;
 
@@ -56,7 +56,7 @@ export default async function Page() {
         </section>
         <section className="rounded-md border p-4">
           <h2 className="font-semibold">
-            What share of this month&apos;s appointments are no-shows?
+            What is the status of all appointments?
           </h2>
           <StatusDonut rows={statusRows} />
         </section>
