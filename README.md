@@ -1,19 +1,74 @@
-## Next.js App Router Course - Starter
+# Clinic Operations Dashboard
 
-This is the starter template for the Next.js App Router Course. It contains the starting code for the dashboard application.
+Production: https://nextjs-dashboard.vercel.app
 
-For more information, see the [course curriculum](https://nextjs.org/learn) on the Next.js Website.
+## What it is
 
+Clinic Operations Dashboard is a web app for a small clinic owner to manage patient records, appointments, and treatments. Its dashboard summarizes patient growth and appointment status to help the owner plan clinic capacity and follow-up.
 
-## Smoke test (8 Oct, run on production as two users)
+## DEMO LOGIN
 
-- [x] 1. Signed out, visiting /dashboard redirects to the login page
-- [x] 2. User one can sign in and lands on /dashboard
-- [x] 3. Patients: create one, edit it, delete it; the list updates each time
-- [x] 4. Appointments: create one (the patient select shows only my patients), edit it, delete it
-- [x] 5. Chart one and chart two render from real rows, with the question as the title and labelled axes / a legend
-- [x] 6. User two (private window) sees none of user one's patients or appointments, and their charts are empty or show only their own data
-- [x] 7. User two opening user one's edit URL directly (/dashboard/patients/<id>/edit) gets the not-found page
-- [x] 8. Submitting an empty create form shows messages under the fields, nothing is saved
-- [x] 9. An unknown URL (/dashboard/nothing-here) shows the not-found page
-- [x] 10. Sign out returns to login; the browser Back button does not reveal the dashboard; .env.local is not in the repository on GitHub
+- Email: `demo@clinic.example`
+- Password: Ask the project maintainer for the current throwaway demo password. Passwords and environment-variable values are not published in this repository.
+- Use a dedicated demo account and non-real sample records; do not enter real patient information.
+
+## Entities and the two questions the charts answer
+
+- **Patients** — contact and date-of-birth details for clinic patients.
+- **Appointments** — scheduled visits linked to a patient, with booked, done, or no-show status.
+- **Treatments** — procedures and fees linked to an appointment.
+
+1. **Is the practice growing?** A bar chart shows new patients per month over the last six months. The clinic owner can use the trend when considering capacity.
+2. **What is the status of this month's appointments?** A donut chart shows booked, done, and no-show appointments for the current month. The clinic owner can use the split to decide whether follow-up is needed.
+
+## How to run locally
+
+1. Clone the repository and install dependencies:
+
+   ```bash
+   pnpm install
+   ```
+
+2. Create `.env.local` with the variable names below. Add values from your own Supabase and Postgres projects; never commit the file.
+
+   ```text
+   POSTGRES_URL
+   SUPABASE_URL
+   NEXT_PUBLIC_SUPABASE_URL
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+   SUPABASE_SECRET_KEY
+   ```
+
+   `SUPABASE_SECRET_KEY` may instead be named `SUPABASE_SERVICE_ROLE_KEY`. These are variable names only; do not use a secret key in a `NEXT_PUBLIC_` variable.
+
+3. Apply the SQL migration files in `supabase/migrations/` to your Supabase project, in filename order.
+4. Start the development server and open [http://localhost:3000](http://localhost:3000):
+
+   ```bash
+   pnpm dev
+   ```
+
+## Demo walkthrough
+
+See [DEMO.md](./DEMO.md) for the five-line presentation script.
+
+## Smoke test
+
+The repository records a production smoke test dated 8 Oct 2026, covering login, patient and appointment CRUD, charts, user data isolation, validation, and sign-out. The current production deployment does not match this working tree, so repeat these checks after redeploying:
+
+- [ ] Signed-out users are redirected from `/dashboard` to login; signing in opens the dashboard.
+- [ ] Patients and appointments can be created, edited, and deleted; lists update.
+- [ ] Both charts show real rows, the stated questions, and labeled axes or a legend.
+- [ ] A second user cannot see the first user's patient or appointment records or open their edit URL.
+- [ ] Invalid forms save nothing; unknown URLs show not-found.
+- [ ] Signing out returns to login and browser Back does not reveal the dashboard.
+
+## Known limitations and next steps
+
+- The production URL responds, but its landing page does not match this repository's clinic booking page. Redeploy and rerun the production smoke test before presenting the current build.
+- Appointment-time conflicts are not prevented, and appointment reminders are not sent automatically.
+- Planned next steps: prevent conflicting bookings, add reminder delivery, and add staff roles.
+
+## Security and privacy
+
+Use only fictional demo records. Keep `.env.local` and all secret keys out of source control. The publishable Supabase key is the only Supabase key intended for a `NEXT_PUBLIC_` variable.
