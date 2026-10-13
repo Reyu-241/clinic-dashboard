@@ -1,6 +1,6 @@
 # Clinic Operations Dashboard
 
-Production: [https://nextjs-dashboard.vercel.app](https://nextjs-dashboard-topaz-seven-22.vercel.app/dashboard)
+Production: https://nextjs-dashboard-topaz-seven-22.vercel.app/
 
 ## What it is
 
