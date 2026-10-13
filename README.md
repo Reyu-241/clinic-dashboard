@@ -72,3 +72,13 @@ The repository records a production smoke test dated 8 Oct 2026, covering login,
 ## Security and privacy
 
 Use only fictional demo records. Keep `.env.local` and all secret keys out of source control. The publishable Supabase key is the only Supabase key intended for a `NEXT_PUBLIC_` variable.
+
+## Tech Stack
+
+- **Languages:** TypeScript/TSX for the app, SQL for database migrations, CSS for styling, and JavaScript for some configuration files.
+- **Framework and UI:** Next.js 16 (App Router) and React.
+- **Styling:** Tailwind CSS, with CSS Modules for the landing page.
+- **Database and data access:** Supabase-hosted PostgreSQL, accessed with the Supabase JavaScript client and `postgres`.js.
+- **Authentication and validation:** NextAuth credentials authentication, `bcryptjs` password comparison, and Zod input validation.
+- **Charts and icons:** Recharts and Heroicons; the appointment-status donut is rendered as SVG.
+- **Build and deployment:** pnpm, Turbopack for local development, ESLint, and Vercel.
