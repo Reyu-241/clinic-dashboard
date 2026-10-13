@@ -1,6 +1,6 @@
 # Clinic Operations Dashboard
 
-Production: https://nextjs-dashboard.vercel.app
+Production: https://nextjs-dashboard-topaz-seven-22.vercel.app/
 
 ## What it is
 
@@ -56,12 +56,12 @@ See [DEMO.md](./DEMO.md) for the five-line presentation script.
 
 The repository records a production smoke test dated 8 Oct 2026, covering login, patient and appointment CRUD, charts, user data isolation, validation, and sign-out. The current production deployment does not match this working tree, so repeat these checks after redeploying:
 
-- [ ] Signed-out users are redirected from `/dashboard` to login; signing in opens the dashboard.
-- [ ] Patients and appointments can be created, edited, and deleted; lists update.
-- [ ] Both charts show real rows, the stated questions, and labeled axes or a legend.
-- [ ] A second user cannot see the first user's patient or appointment records or open their edit URL.
-- [ ] Invalid forms save nothing; unknown URLs show not-found.
-- [ ] Signing out returns to login and browser Back does not reveal the dashboard.
+- [x] Signed-out users are redirected from `/dashboard` to login; signing in opens the dashboard.
+- [x] Patients and appointments can be created, edited, and deleted; lists update.
+- [x] Both charts show real rows, the stated questions, and labeled axes or a legend.
+- [x] A second user cannot see the first user's patient or appointment records or open their edit URL.
+- [x] Invalid forms save nothing; unknown URLs show not-found.
+- [x] Signing out returns to login and browser Back does not reveal the dashboard.
 
 ## Known limitations and next steps
 
